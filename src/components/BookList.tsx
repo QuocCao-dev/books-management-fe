@@ -1,18 +1,19 @@
 import { Spinner } from "@material-tailwind/react";
-import axios from "axios";
 import { useEffect, useState } from "react";
+import axiosClient from "../services/axios-client";
 import { TBook } from "../types/book";
 import Book from "./Book";
+import { useLoading } from "../hooks/useLoading";
 
 const BookList = () => {
   const [books, setBooks] = useState<TBook[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, { showLoading, hideLoading }] = useLoading();
 
   const fetchBooks = async () => {
-    setIsLoading(true);
-    const response = await axios.get("http://localhost:4200/api/books");
+    showLoading();
+    const response = await axiosClient.get("/books");
     setBooks(response.data);
-    setIsLoading(false);
+    hideLoading();
   };
 
   useEffect(() => {
@@ -21,7 +22,7 @@ const BookList = () => {
 
   return (
     <div className="space-y-2">
-      {isLoading ? (
+      {loading ? (
         <Spinner />
       ) : (
         books.map((book) => <Book key={book.id} book={book} />)

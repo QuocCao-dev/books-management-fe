@@ -8,7 +8,11 @@ import {
   Option,
 } from "@material-tailwind/react";
 
-const BookForm = () => {
+type Props = {
+  onCancel: () => void;
+};
+
+const BookForm = ({ onCancel }: Props) => {
   return (
     <Card className="p-4">
       <Typography variant="h4" color="blue-gray">
@@ -36,7 +40,9 @@ const BookForm = () => {
         </div>
 
         <div className="flex gap-2">
-          <Button fullWidth>Cancel</Button>
+          <Button fullWidth onClick={onCancel}>
+            Cancel
+          </Button>
           <Button fullWidth color="blue">
             Submit
           </Button>
