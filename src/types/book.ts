@@ -1,3 +1,5 @@
+import { TTag } from "./tag";
+
 export type TBook = {
   id: string;
   name: string;
@@ -5,5 +7,5 @@ export type TBook = {
   price: number;
   publicationDate: string;
   author: string;
-  tags: string[];
+  tags: TTag[];
 };

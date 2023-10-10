@@ -2,12 +2,29 @@ import { Button } from "@material-tailwind/react";
 import BookList from "./components/BookList";
 import TagForm from "./components/TagForm";
 import BookForm from "./components/BookForm";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { TBook } from "./types/book";
+import axiosClient from "./services/axios-client";
+import { useLoading } from "./hooks/useLoading";
 
 type FormType = "tag" | "book" | null;
 
 function App() {
-  const [selectedForm, setSelectedForm] = useState<FormType>(null);
+  const [selectedForm, setSelectedForm] = useState<FormType>("book");
+
+  const [books, setBooks] = useState<TBook[]>([]);
+  const [loading, { showLoading, hideLoading }] = useLoading();
+
+  const fetchBooks = async () => {
+    showLoading();
+    const response = await axiosClient.get("/books");
+    setBooks(response.data);
+    hideLoading();
+  };
+
+  useEffect(() => {
+    fetchBooks();
+  }, []);
 
   const handleSelectForm = (form: FormType) => () => {
     setSelectedForm(form);
@@ -27,14 +44,17 @@ function App() {
 
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8">
-            <BookList />
+            <BookList books={books} loading={loading} />
           </div>
           <div className="col-span-4 space-y-2">
             {selectedForm === "tag" && (
               <TagForm onCancel={handleSelectForm(null)} />
             )}
             {selectedForm === "book" && (
-              <BookForm onCancel={handleSelectForm(null)} />
+              <BookForm
+                onCancel={handleSelectForm(null)}
+                onFetchBooks={fetchBooks}
+              />
             )}
           </div>
         </div>

@@ -5,11 +5,14 @@ import {
   Typography,
   Alert,
   Chip,
+  Checkbox,
+  Radio,
 } from "@material-tailwind/react";
 import { FormEvent, useEffect, useState } from "react";
 import axiosClient from "../services/axios-client";
 import { TTag } from "../types/tag";
 import { useLoading } from "../hooks/useLoading";
+import { type color } from "@material-tailwind/react/types/components/chip";
 
 type Props = {
   onCancel: () => void;
@@ -17,6 +20,8 @@ type Props = {
 
 const TagForm = ({ onCancel }: Props) => {
   const [tagName, setTagName] = useState("");
+  const [tagColor, setTagColor] = useState("blue");
+
   const [showAlert, setShowAlert] = useState(false);
   const [tags, setTags] = useState<TTag[]>([]);
   const [loading, { showLoading, hideLoading }] = useLoading();
@@ -34,8 +39,10 @@ const TagForm = ({ onCancel }: Props) => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     await axiosClient.post("/tags", {
       name: tagName,
+      color: tagColor,
     });
 
     setShowAlert(true);
@@ -44,6 +51,8 @@ const TagForm = ({ onCancel }: Props) => {
     setTimeout(() => {
       setShowAlert(false);
     }, 3000);
+
+    getTags();
   };
 
   return (
@@ -57,7 +66,12 @@ const TagForm = ({ onCancel }: Props) => {
       ) : (
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
-            <Chip key={tag.id} color="blue" value={tag.name} size="sm" />
+            <Chip
+              key={tag.id}
+              color={tag.color as color}
+              value={tag.name}
+              size="sm"
+            />
           ))}
         </div>
       )}
@@ -71,6 +85,56 @@ const TagForm = ({ onCancel }: Props) => {
             variant="outlined"
             crossOrigin={true}
           />
+
+          <div className="flex flex-wrap gap-4">
+            <Radio
+              name="color"
+              color="blue"
+              label="Blue"
+              defaultChecked
+              onChange={(e) => {
+                setTagColor(e.target.value);
+              }}
+              value={tagColor}
+            />
+            <Radio
+              name="color"
+              color="red"
+              value="red"
+              label="Red"
+              onChange={(e) => {
+                setTagColor(e.target.value);
+              }}
+            />
+            <Radio
+              name="color"
+              color="green"
+              label="Green"
+              value="green"
+              onChange={(e) => {
+                setTagColor(e.target.value);
+              }}
+            />
+            <Radio
+              name="color"
+              color="amber"
+              label="Amber"
+              value="amber"
+              onChange={(e) => {
+                setTagColor(e.target.value);
+              }}
+            />
+            <Radio
+              name="color"
+              color="teal"
+              label="Teal"
+              value="teal"
+              onChange={(e) => {
+                setTagColor(e.target.value);
+              }}
+            />
+          </div>
+
           {showAlert && <Alert color="green">Tag created successfully!</Alert>}
         </div>
 

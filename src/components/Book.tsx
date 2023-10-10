@@ -1,4 +1,6 @@
 import { Card, CardBody, Typography, Chip } from "@material-tailwind/react";
+import { type color } from "@material-tailwind/react/types/components/chip";
+
 import { TBook } from "../types/book";
 
 type Props = {
@@ -19,7 +21,7 @@ const Book = ({ book }: Props) => {
         <div className="flex items-center gap-2">
           <Typography variant="small">Tags:</Typography>
           {book.tags.map((tag) => (
-            <Chip color="blue" value={tag} key={tag} />
+            <Chip color={tag.color as color} value={tag.name} key={tag.id} />
           ))}
         </div>
       </CardBody>
