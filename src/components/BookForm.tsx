@@ -14,24 +14,26 @@ import axiosClient from "../services/axios-client";
 import { useLoading } from "../hooks/useLoading";
 import { TTag } from "../types/tag";
 import { color } from "@material-tailwind/react/types/components/chip";
+import { TBook } from "../types/book";
 
 type Props = {
   onCancel: () => void;
   onFetchBooks: () => void;
+  book: TBook | null;
+  onClose: () => void;
 };
 
-const BookForm = ({ onCancel, onFetchBooks }: Props) => {
+const BookForm = ({ onCancel, onFetchBooks, book, onClose }: Props) => {
   const [bookForm, setBookForm] = useState({
     name: "",
     description: "",
-    price: "0",
+    price: "",
     publicationDate: "",
     author: "",
   });
   const [loading, { showLoading, hideLoading }] = useLoading();
   const [tags, setTags] = useState<TTag[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  console.log("selectedTags", selectedTags);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,7 +44,14 @@ const BookForm = ({ onCancel, onFetchBooks }: Props) => {
       tags: selectedTags,
     };
 
-    await axiosClient.post("/books", data);
+    if (book) {
+      // edit book
+      await axiosClient.patch(`/books/${book?.id}`, data);
+    } else {
+      // add new book
+      await axiosClient.post("/books", data);
+    }
+    onClose();
     onFetchBooks();
   };
 
@@ -56,6 +65,18 @@ const BookForm = ({ onCancel, onFetchBooks }: Props) => {
   useEffect(() => {
     getTags();
   }, []);
+
+  useEffect(() => {
+    if (!book) return;
+    setBookForm({
+      name: book.name,
+      description: book.description,
+      price: book.price.toString(),
+      publicationDate: book.publicationDate,
+      author: book.author,
+    });
+    setSelectedTags(book.tags.map((tag) => tag.id));
+  }, [book]);
 
   return (
     <Card className="p-4">
@@ -127,6 +148,7 @@ const BookForm = ({ onCancel, onFetchBooks }: Props) => {
                         );
                       }
                     }}
+                    checked={selectedTags.includes(tag.id)}
                     color={tag.color as color}
                     ripple={false}
                     containerProps={{ className: "p-0" }}

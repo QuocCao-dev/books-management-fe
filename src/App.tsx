@@ -15,6 +15,7 @@ function App() {
 
   const [books, setBooks] = useState<TBook[]>([]);
   const [loading, { showLoading, hideLoading }] = useLoading();
+  const [selectedBook, setSelectedBook] = useState<TBook | null>(null);
 
   const fetchBooks = async () => {
     showLoading();
@@ -31,6 +32,21 @@ function App() {
     setSelectedForm(form);
   };
 
+  const handleEditBook = (book: TBook) => {
+    setSelectedForm("book");
+    setSelectedBook(book);
+  };
+
+  const handleCloseBookForm = () => {
+    setSelectedForm(null);
+    setSelectedBook(null);
+  };
+
+  const handleDeleteBook = async (book: TBook) => {
+    await axiosClient.delete(`/books/${book.id}`);
+    fetchBooks();
+  };
+
   return (
     <div className="min-h-screen bg-blue-gray-200">
       <div className="container py-8 mx-auto space-y-4">
@@ -45,7 +61,12 @@ function App() {
 
         <div className="grid grid-cols-12 gap-4">
           <div className={cn(selectedForm ? "col-span-8" : "col-span-12")}>
-            <BookList books={books} loading={loading} />
+            <BookList
+              books={books}
+              loading={loading}
+              onEdit={handleEditBook}
+              onDelete={handleDeleteBook}
+            />
           </div>
           <div className="col-span-4 space-y-2">
             {selectedForm === "tag" && (
@@ -55,6 +76,8 @@ function App() {
               <BookForm
                 onCancel={handleSelectForm(null)}
                 onFetchBooks={fetchBooks}
+                book={selectedBook}
+                onClose={handleCloseBookForm}
               />
             )}
           </div>
