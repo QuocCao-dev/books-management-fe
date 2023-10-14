@@ -4,7 +4,7 @@ import Book from "./Book";
 
 type Props = {
   books: TBook[];
-  loading: boolean;
+  loading?: boolean;
 };
 
 const BookList = ({ books, loading }: Props) => {

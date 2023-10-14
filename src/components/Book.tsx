@@ -10,6 +10,7 @@ import { type color } from "@material-tailwind/react/types/components/chip";
 import { TBook } from "../types/book";
 import useBookStore from "../stores/book";
 import useFormModalStore from "../stores/form-modal";
+import { useBooks } from "../hooks/useBooks";
 
 type Props = {
   book: TBook;
@@ -18,14 +19,15 @@ type Props = {
 const Book = ({ book }: Props) => {
   const { setSelectedBook } = useBookStore();
   const { setForm } = useFormModalStore();
+  const { deleteBook } = useBooks();
 
   const handleClickEdit = () => {
     setForm("book");
     setSelectedBook(book);
   };
 
-  const handleClickDelete = () => {
-    setSelectedBook(book);
+  const handleClickDelete = async () => {
+    await deleteBook(book);
   };
 
   return (

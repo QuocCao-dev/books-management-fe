@@ -15,15 +15,16 @@ import { useLoading } from "../hooks/useLoading";
 import { TTag } from "../types/tag";
 import { color } from "@material-tailwind/react/types/components/chip";
 import { TBook } from "../types/book";
+import { useBooks } from "../hooks/useBooks";
 
 type Props = {
   onCancel: () => void;
-  onFetchBooks: () => void;
   book: TBook | null;
   onClose: () => void;
 };
 
-const BookForm = ({ onCancel, onFetchBooks, book, onClose }: Props) => {
+const BookForm = ({ onCancel, book, onClose }: Props) => {
+  const { addBook, editBook } = useBooks();
   const [bookForm, setBookForm] = useState({
     name: "",
     description: "",
@@ -46,13 +47,12 @@ const BookForm = ({ onCancel, onFetchBooks, book, onClose }: Props) => {
 
     if (book) {
       // edit book
-      await axiosClient.patch(`/books/${book?.id}`, data);
+      await editBook(book.id, data);
     } else {
       // add new book
-      await axiosClient.post("/books", data);
+      await addBook(data);
     }
     onClose();
-    onFetchBooks();
   };
 
   const getTags = async () => {
