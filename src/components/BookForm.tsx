@@ -6,9 +6,14 @@ import {
   Textarea,
   Select,
   Option,
+  Chip,
+  Checkbox,
 } from "@material-tailwind/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axiosClient from "../services/axios-client";
+import { useLoading } from "../hooks/useLoading";
+import { TTag } from "../types/tag";
+import { color } from "@material-tailwind/react/types/components/chip";
 
 type Props = {
   onCancel: () => void;
@@ -23,6 +28,10 @@ const BookForm = ({ onCancel, onFetchBooks }: Props) => {
     publicationDate: "",
     author: "",
   });
+  const [loading, { showLoading, hideLoading }] = useLoading();
+  const [tags, setTags] = useState<TTag[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  console.log("selectedTags", selectedTags);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,11 +39,23 @@ const BookForm = ({ onCancel, onFetchBooks }: Props) => {
     const data = {
       ...bookForm,
       price: +bookForm.price,
+      tags: selectedTags,
     };
 
     await axiosClient.post("/books", data);
     onFetchBooks();
   };
+
+  const getTags = async () => {
+    showLoading();
+    const response = await axiosClient.get("/tags");
+    setTags(response.data);
+    hideLoading();
+  };
+
+  useEffect(() => {
+    getTags();
+  }, []);
 
   return (
     <Card className="p-4">
@@ -86,13 +107,35 @@ const BookForm = ({ onCancel, onFetchBooks }: Props) => {
               setBookForm({ ...bookForm, publicationDate: e.target.value })
             }
           />
-          <Select label="Select Tags">
-            <Option>Material Tailwind HTML</Option>
-            <Option>Material Tailwind React</Option>
-            <Option>Material Tailwind Vue</Option>
-            <Option>Material Tailwind Angular</Option>
-            <Option>Material Tailwind Svelte</Option>
-          </Select>
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <Chip
+                value={tag.name}
+                variant="ghost"
+                color={tag.color as color}
+                icon={
+                  <Checkbox
+                    value={tag.id}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      const isExist = selectedTags.includes(id);
+                      if (!isExist) {
+                        setSelectedTags([...selectedTags, id]);
+                      } else {
+                        setSelectedTags(
+                          selectedTags.filter((tagId) => tagId !== id)
+                        );
+                      }
+                    }}
+                    color={tag.color as color}
+                    ripple={false}
+                    containerProps={{ className: "p-0" }}
+                    crossOrigin={undefined}
+                  />
+                }
+              />
+            ))}
+          </div>
         </div>
 
         <div className="flex gap-2">

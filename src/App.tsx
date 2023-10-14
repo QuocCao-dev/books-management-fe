@@ -3,6 +3,7 @@ import BookList from "./components/BookList";
 import TagForm from "./components/TagForm";
 import BookForm from "./components/BookForm";
 import { useEffect, useState } from "react";
+import cn from "clsx";
 import { TBook } from "./types/book";
 import axiosClient from "./services/axios-client";
 import { useLoading } from "./hooks/useLoading";
@@ -10,7 +11,7 @@ import { useLoading } from "./hooks/useLoading";
 type FormType = "tag" | "book" | null;
 
 function App() {
-  const [selectedForm, setSelectedForm] = useState<FormType>("book");
+  const [selectedForm, setSelectedForm] = useState<FormType>(null);
 
   const [books, setBooks] = useState<TBook[]>([]);
   const [loading, { showLoading, hideLoading }] = useLoading();
@@ -43,7 +44,7 @@ function App() {
         </div>
 
         <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-8">
+          <div className={cn(selectedForm ? "col-span-8" : "col-span-12")}>
             <BookList books={books} loading={loading} />
           </div>
           <div className="col-span-4 space-y-2">

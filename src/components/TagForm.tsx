@@ -5,7 +5,6 @@ import {
   Typography,
   Alert,
   Chip,
-  Checkbox,
   Radio,
 } from "@material-tailwind/react";
 import { FormEvent, useEffect, useState } from "react";
@@ -96,6 +95,7 @@ const TagForm = ({ onCancel }: Props) => {
                 setTagColor(e.target.value);
               }}
               value={tagColor}
+              crossOrigin={undefined}
             />
             <Radio
               name="color"
@@ -105,6 +105,7 @@ const TagForm = ({ onCancel }: Props) => {
               onChange={(e) => {
                 setTagColor(e.target.value);
               }}
+              crossOrigin={undefined}
             />
             <Radio
               name="color"
@@ -114,6 +115,7 @@ const TagForm = ({ onCancel }: Props) => {
               onChange={(e) => {
                 setTagColor(e.target.value);
               }}
+              crossOrigin={undefined}
             />
             <Radio
               name="color"
@@ -123,6 +125,7 @@ const TagForm = ({ onCancel }: Props) => {
               onChange={(e) => {
                 setTagColor(e.target.value);
               }}
+              crossOrigin={undefined}
             />
             <Radio
               name="color"
@@ -132,6 +135,7 @@ const TagForm = ({ onCancel }: Props) => {
               onChange={(e) => {
                 setTagColor(e.target.value);
               }}
+              crossOrigin={undefined}
             />
           </div>
 
