@@ -7,15 +7,15 @@ import cn from "clsx";
 import { TBook } from "./types/book";
 import axiosClient from "./services/axios-client";
 import { useLoading } from "./hooks/useLoading";
-
-type FormType = "tag" | "book" | null;
+import useBookStore from "./stores/book";
+import useFormModalStore, { FormType } from "./stores/form-modal";
 
 function App() {
-  const [selectedForm, setSelectedForm] = useState<FormType>(null);
-
   const [books, setBooks] = useState<TBook[]>([]);
   const [loading, { showLoading, hideLoading }] = useLoading();
-  const [selectedBook, setSelectedBook] = useState<TBook | null>(null);
+
+  const { selectedBook } = useBookStore();
+  const { form, setForm } = useFormModalStore();
 
   const fetchBooks = async () => {
     showLoading();
@@ -29,17 +29,11 @@ function App() {
   }, []);
 
   const handleSelectForm = (form: FormType) => () => {
-    setSelectedForm(form);
-  };
-
-  const handleEditBook = (book: TBook) => {
-    setSelectedForm("book");
-    setSelectedBook(book);
+    setForm(form);
   };
 
   const handleCloseBookForm = () => {
-    setSelectedForm(null);
-    setSelectedBook(null);
+    setForm(null);
   };
 
   const handleDeleteBook = async (book: TBook) => {
@@ -60,19 +54,12 @@ function App() {
         </div>
 
         <div className="grid grid-cols-12 gap-4">
-          <div className={cn(selectedForm ? "col-span-8" : "col-span-12")}>
-            <BookList
-              books={books}
-              loading={loading}
-              onEdit={handleEditBook}
-              onDelete={handleDeleteBook}
-            />
+          <div className={cn(form ? "col-span-8" : "col-span-12")}>
+            <BookList books={books} loading={loading} />
           </div>
           <div className="col-span-4 space-y-2">
-            {selectedForm === "tag" && (
-              <TagForm onCancel={handleSelectForm(null)} />
-            )}
-            {selectedForm === "book" && (
+            {form === "tag" && <TagForm onCancel={handleSelectForm(null)} />}
+            {form === "book" && (
               <BookForm
                 onCancel={handleSelectForm(null)}
                 onFetchBooks={fetchBooks}

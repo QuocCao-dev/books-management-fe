@@ -8,20 +8,24 @@ import {
 import { type color } from "@material-tailwind/react/types/components/chip";
 
 import { TBook } from "../types/book";
+import useBookStore from "../stores/book";
+import useFormModalStore from "../stores/form-modal";
 
 type Props = {
   book: TBook;
-  onEdit: (book: TBook) => void;
-  onDelete: (book: TBook) => void;
 };
 
-const Book = ({ book, onEdit, onDelete }: Props) => {
+const Book = ({ book }: Props) => {
+  const { setSelectedBook } = useBookStore();
+  const { setForm } = useFormModalStore();
+
   const handleClickEdit = () => {
-    onEdit(book);
+    setForm("book");
+    setSelectedBook(book);
   };
 
   const handleClickDelete = () => {
-    onDelete(book);
+    setSelectedBook(book);
   };
 
   return (
