@@ -18,6 +18,7 @@ const AppChip = ({ options, control, name }: Props) => {
 
   return options?.map((option) => (
     <Chip
+      key={option.id}
       value={option.name}
       variant="ghost"
       color={option.color as color}

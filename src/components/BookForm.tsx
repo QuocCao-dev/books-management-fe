@@ -15,7 +15,7 @@ type Props = {
 };
 
 const BookForm = ({ onCancel, book, onClose }: Props) => {
-  const { control, handleSubmit: handleSubmitForm } = useForm();
+  const { control, handleSubmit: handleSubmitForm, reset } = useForm();
 
   const { addBook, editBook } = useBooks();
 
@@ -51,6 +51,7 @@ const BookForm = ({ onCancel, book, onClose }: Props) => {
 
   useEffect(() => {
     if (!book) return;
+    reset({ ...book, tags: book.tags.map((tag) => tag.id) });
   }, [book]);
 
   return (
@@ -61,7 +62,7 @@ const BookForm = ({ onCancel, book, onClose }: Props) => {
 
       <form
         className="max-w-screen-lg mt-8 mb-2"
-        onSubmit={handleSubmitForm((values) => handleSubmit(values))}
+        onSubmit={handleSubmitForm(handleSubmit)}
       >
         <div className="flex flex-col gap-4 mb-4">
           <AppInput label="Book Name" name="name" control={control} />

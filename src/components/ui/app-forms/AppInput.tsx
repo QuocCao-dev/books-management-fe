@@ -5,9 +5,10 @@ type Props = {
   name: string;
   label: string;
   control: any;
+  error?: boolean;
 };
 
-const AppInput = ({ label, control, name }: Props) => {
+const AppInput = ({ label, control, name, error }: Props) => {
   const { field } = useController({
     name,
     control,
@@ -20,6 +21,7 @@ const AppInput = ({ label, control, name }: Props) => {
       label={label}
       variant="outlined"
       crossOrigin={true}
+      error={error}
     />
   );
 };

@@ -12,19 +12,54 @@ import { useLoading } from "../hooks/useLoading";
 import axiosClient from "../services/axios-client";
 import { TTag } from "../types/tag";
 import { AppInput, AppRadio } from "./ui/app-forms";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type Props = {
   onCancel: () => void;
 };
 
-type FormValues = {
-  name: string;
-  color: string;
-};
+export type TOptions = typeof options;
+
+const options = [
+  {
+    color: "blue",
+    label: "Blue",
+  },
+  {
+    color: "red",
+    label: "Red",
+  },
+  {
+    color: "green",
+    label: "Green",
+  },
+  {
+    color: "amber",
+    label: "Amber",
+  },
+  {
+    color: "teal",
+    label: "Teal",
+  },
+];
+
+const validationSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  color: z.string().min(1, "Color is required"),
+});
+
+type FormValues = z.infer<typeof validationSchema>;
 
 const TagForm = ({ onCancel }: Props) => {
-  const form = useForm();
-  const { control, handleSubmit: handleSubmitForm } = form;
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      color: options[0].color,
+    },
+    resolver: zodResolver(validationSchema),
+  });
+  const { control, handleSubmit: handleSubmitForm, formState } = form;
 
   const [showAlert, setShowAlert] = useState(false);
   const [tags, setTags] = useState<TTag[]>([]);
@@ -57,29 +92,6 @@ const TagForm = ({ onCancel }: Props) => {
     getTags();
   };
 
-  const options = [
-    {
-      color: "blue",
-      label: "Blue",
-    },
-    {
-      color: "red",
-      label: "Red",
-    },
-    {
-      color: "green",
-      label: "Green",
-    },
-    {
-      color: "amber",
-      label: "Amber",
-    },
-    {
-      color: "teal",
-      label: "Teal",
-    },
-  ];
-
   return (
     <Card className="p-4">
       <Typography variant="h4" color="blue-gray">
@@ -103,16 +115,29 @@ const TagForm = ({ onCancel }: Props) => {
 
       <form
         className="max-w-screen-lg mt-8 mb-2"
-        onSubmit={handleSubmitForm((values) => {
-          handleSubmit(values);
-        })}
+        onSubmit={handleSubmitForm(handleSubmit)}
       >
         <div className="flex flex-col gap-6 mb-4">
-          <AppInput name="name" label="Name" control={control} />
+          <AppInput
+            name="name"
+            label="Name"
+            control={control}
+            error={Boolean(formState?.errors?.name)}
+          />
+          {formState?.errors?.name && (
+            <Typography variant="small" color="red">
+              {formState.errors?.name.message}
+            </Typography>
+          )}
 
           <div className="flex flex-wrap gap-4">
             <AppRadio name="color" control={control} options={options} />
           </div>
+          {formState?.errors?.color && (
+            <Typography variant="small" color="red">
+              {formState.errors?.color.message}
+            </Typography>
+          )}
 
           {showAlert && <Alert color="green">Tag created successfully!</Alert>}
         </div>
