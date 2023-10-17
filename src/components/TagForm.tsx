@@ -1,20 +1,17 @@
 import {
-  Card,
-  Input,
-  Button,
-  Typography,
   Alert,
+  Button,
+  Card,
   Chip,
-  Radio,
+  Typography,
 } from "@material-tailwind/react";
-import { FormEvent, useEffect, useState } from "react";
+import { type color } from "@material-tailwind/react/types/components/chip";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useLoading } from "../hooks/useLoading";
 import axiosClient from "../services/axios-client";
 import { TTag } from "../types/tag";
-import { useLoading } from "../hooks/useLoading";
-import { type color } from "@material-tailwind/react/types/components/chip";
-import { useForm } from "react-hook-form";
-import AppInput from "./ui/AppInput";
-import AppRadio from "./ui/AppRadio";
+import { AppInput, AppRadio } from "./ui/app-forms";
 
 type Props = {
   onCancel: () => void;

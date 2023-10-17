@@ -1,21 +1,12 @@
-import {
-  Card,
-  Input,
-  Button,
-  Typography,
-  Textarea,
-  Select,
-  Option,
-  Chip,
-  Checkbox,
-} from "@material-tailwind/react";
+import { Button, Card, Typography } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
-import axiosClient from "../services/axios-client";
-import { useLoading } from "../hooks/useLoading";
-import { TTag } from "../types/tag";
-import { color } from "@material-tailwind/react/types/components/chip";
-import { TBook } from "../types/book";
+import { useForm } from "react-hook-form";
 import { useBooks } from "../hooks/useBooks";
+import { useLoading } from "../hooks/useLoading";
+import axiosClient from "../services/axios-client";
+import { TBook } from "../types/book";
+import { TTag } from "../types/tag";
+import { AppChip, AppInput, AppTextarea } from "./ui/app-forms";
 
 type Props = {
   onCancel: () => void;
@@ -24,33 +15,25 @@ type Props = {
 };
 
 const BookForm = ({ onCancel, book, onClose }: Props) => {
+  const { control, handleSubmit: handleSubmitForm } = useForm();
+
   const { addBook, editBook } = useBooks();
-  const [bookForm, setBookForm] = useState({
-    name: "",
-    description: "",
-    price: "",
-    publicationDate: "",
-    author: "",
-  });
+
   const [loading, { showLoading, hideLoading }] = useLoading();
   const [tags, setTags] = useState<TTag[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const data = {
-      ...bookForm,
-      price: +bookForm.price,
-      tags: selectedTags,
+  const handleSubmit = async (values: any) => {
+    const convertValues = {
+      ...values,
+      price: +values.price,
     };
 
     if (book) {
       // edit book
-      await editBook(book.id, data);
+      await editBook(book.id, convertValues);
     } else {
       // add new book
-      await addBook(data);
+      await addBook(convertValues);
     }
     onClose();
   };
@@ -68,14 +51,6 @@ const BookForm = ({ onCancel, book, onClose }: Props) => {
 
   useEffect(() => {
     if (!book) return;
-    setBookForm({
-      name: book.name,
-      description: book.description,
-      price: book.price.toString(),
-      publicationDate: book.publicationDate,
-      author: book.author,
-    });
-    setSelectedTags(book.tags.map((tag) => tag.id));
   }, [book]);
 
   return (
@@ -84,79 +59,26 @@ const BookForm = ({ onCancel, book, onClose }: Props) => {
         Book Form
       </Typography>
 
-      <form className="max-w-screen-lg mt-8 mb-2" onSubmit={handleSubmit}>
+      <form
+        className="max-w-screen-lg mt-8 mb-2"
+        onSubmit={handleSubmitForm((values) => handleSubmit(values))}
+      >
         <div className="flex flex-col gap-4 mb-4">
-          <Input
-            label="Book Name"
-            variant="outlined"
-            crossOrigin={true}
-            value={bookForm.name}
-            onChange={(e) => setBookForm({ ...bookForm, name: e.target.value })}
-          />
-          <Textarea
+          <AppInput label="Book Name" name="name" control={control} />
+          <AppTextarea
             label="Description"
-            variant="outlined"
-            value={bookForm.description}
-            onChange={(e) =>
-              setBookForm({ ...bookForm, description: e.target.value })
-            }
+            name="description"
+            control={control}
           />
-          <Input
-            label="Price"
-            variant="outlined"
-            crossOrigin={true}
-            value={bookForm.price}
-            onChange={(e) =>
-              setBookForm({ ...bookForm, price: e.target.value })
-            }
-          />
-          <Input
-            label="Author"
-            variant="outlined"
-            crossOrigin={true}
-            value={bookForm.author}
-            onChange={(e) =>
-              setBookForm({ ...bookForm, author: e.target.value })
-            }
-          />
-          <Input
+          <AppInput label="Price" name="price" control={control} />
+          <AppInput label="Author" name="author" control={control} />
+          <AppInput
             label="Publication Year"
-            variant="outlined"
-            crossOrigin={true}
-            value={bookForm.publicationDate}
-            onChange={(e) =>
-              setBookForm({ ...bookForm, publicationDate: e.target.value })
-            }
+            name="publicationDate"
+            control={control}
           />
           <div className="flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <Chip
-                value={tag.name}
-                variant="ghost"
-                color={tag.color as color}
-                icon={
-                  <Checkbox
-                    value={tag.id}
-                    onChange={(e) => {
-                      const id = e.target.value;
-                      const isExist = selectedTags.includes(id);
-                      if (!isExist) {
-                        setSelectedTags([...selectedTags, id]);
-                      } else {
-                        setSelectedTags(
-                          selectedTags.filter((tagId) => tagId !== id)
-                        );
-                      }
-                    }}
-                    checked={selectedTags.includes(tag.id)}
-                    color={tag.color as color}
-                    ripple={false}
-                    containerProps={{ className: "p-0" }}
-                    crossOrigin={undefined}
-                  />
-                }
-              />
-            ))}
+            <AppChip options={tags} name="tags" control={control} />
           </div>
         </div>
 
