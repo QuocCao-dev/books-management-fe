@@ -12,14 +12,22 @@ import axiosClient from "../services/axios-client";
 import { TTag } from "../types/tag";
 import { useLoading } from "../hooks/useLoading";
 import { type color } from "@material-tailwind/react/types/components/chip";
+import { useForm } from "react-hook-form";
+import AppInput from "./ui/AppInput";
+import AppRadio from "./ui/AppRadio";
 
 type Props = {
   onCancel: () => void;
 };
 
+type FormValues = {
+  name: string;
+  color: string;
+};
+
 const TagForm = ({ onCancel }: Props) => {
-  const [tagName, setTagName] = useState("");
-  const [tagColor, setTagColor] = useState("blue");
+  const form = useForm();
+  const { control, handleSubmit: handleSubmitForm } = form;
 
   const [showAlert, setShowAlert] = useState(false);
   const [tags, setTags] = useState<TTag[]>([]);
@@ -36,16 +44,14 @@ const TagForm = ({ onCancel }: Props) => {
     getTags();
   }, []);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async (values: FormValues) => {
+    const { name, color } = values;
     await axiosClient.post("/tags", {
-      name: tagName,
-      color: tagColor,
+      name,
+      color,
     });
 
     setShowAlert(true);
-    setTagName("");
 
     setTimeout(() => {
       setShowAlert(false);
@@ -53,6 +59,29 @@ const TagForm = ({ onCancel }: Props) => {
 
     getTags();
   };
+
+  const options = [
+    {
+      color: "blue",
+      label: "Blue",
+    },
+    {
+      color: "red",
+      label: "Red",
+    },
+    {
+      color: "green",
+      label: "Green",
+    },
+    {
+      color: "amber",
+      label: "Amber",
+    },
+    {
+      color: "teal",
+      label: "Teal",
+    },
+  ];
 
   return (
     <Card className="p-4">
@@ -75,68 +104,17 @@ const TagForm = ({ onCancel }: Props) => {
         </div>
       )}
 
-      <form className="max-w-screen-lg mt-8 mb-2" onSubmit={handleSubmit}>
+      <form
+        className="max-w-screen-lg mt-8 mb-2"
+        onSubmit={handleSubmitForm((values) => {
+          handleSubmit(values);
+        })}
+      >
         <div className="flex flex-col gap-6 mb-4">
-          <Input
-            value={tagName}
-            onChange={(e) => setTagName(e.target.value)}
-            label="Tag Name"
-            variant="outlined"
-            crossOrigin={true}
-          />
+          <AppInput name="name" label="Name" control={control} />
 
           <div className="flex flex-wrap gap-4">
-            <Radio
-              name="color"
-              color="blue"
-              label="Blue"
-              defaultChecked
-              onChange={(e) => {
-                setTagColor(e.target.value);
-              }}
-              value={tagColor}
-              crossOrigin={undefined}
-            />
-            <Radio
-              name="color"
-              color="red"
-              value="red"
-              label="Red"
-              onChange={(e) => {
-                setTagColor(e.target.value);
-              }}
-              crossOrigin={undefined}
-            />
-            <Radio
-              name="color"
-              color="green"
-              label="Green"
-              value="green"
-              onChange={(e) => {
-                setTagColor(e.target.value);
-              }}
-              crossOrigin={undefined}
-            />
-            <Radio
-              name="color"
-              color="amber"
-              label="Amber"
-              value="amber"
-              onChange={(e) => {
-                setTagColor(e.target.value);
-              }}
-              crossOrigin={undefined}
-            />
-            <Radio
-              name="color"
-              color="teal"
-              label="Teal"
-              value="teal"
-              onChange={(e) => {
-                setTagColor(e.target.value);
-              }}
-              crossOrigin={undefined}
-            />
+            <AppRadio name="color" control={control} options={options} />
           </div>
 
           {showAlert && <Alert color="green">Tag created successfully!</Alert>}
