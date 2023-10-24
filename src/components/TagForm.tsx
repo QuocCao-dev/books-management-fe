@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Alert,
   Button,
@@ -6,15 +7,13 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { type color } from "@material-tailwind/react/types/components/chip";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useLoading } from "../hooks/useLoading";
+import { z } from "zod";
+import { useTags } from "../hooks/useTags";
 import axiosClient from "../services/axios-client";
 import { TTag } from "../types/tag";
 import { AppInput, AppRadio } from "./ui/app-forms";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useTags } from "../hooks/useTags";
 
 type Props = {
   onCancel: () => void;

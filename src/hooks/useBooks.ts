@@ -1,11 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosClient from "../services/axios-client";
-import useBooksStore from "../stores/books";
 import { TBook } from "../types/book";
 
 export function useBooks() {
-  // Single Source Of Truth
-  const { setBooks } = useBooksStore();
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ["books"],
@@ -15,32 +13,39 @@ export function useBooks() {
     },
   });
 
-  const fetchBooks = async () => {
-    const response = await axiosClient.get("/books");
-    setBooks(response.data);
-  };
+  const addBookMutation = useMutation({
+    mutationFn: async (book: any) => {
+      return axiosClient.post("/books", book);
+    },
+    // onSuccess: mutationFn => Promise fulfilled
+    onSuccess: async () => {
+      queryClient.invalidateQueries(["books"]);
+    },
+    // onError: mutationFn => Promise rejected
+    onError: async () => {
+      console.log("onError");
+    },
+  });
 
-  const addBook = async (book: any) => {
-    await axiosClient.post("/books", book);
-    await fetchBooks();
-  };
+  const deleteBookMutation = useMutation({
+    mutationFn: async (book: TBook) => {
+      return axiosClient.delete(`/books/${book.id}`);
+    },
+    onSuccess: async () => {
+      queryClient.invalidateQueries(["books"]);
+    },
+  });
 
   const editBook = async (id: string, book: any) => {
     await axiosClient.patch(`/books/${id}`, book);
-    await fetchBooks();
-  };
-
-  const deleteBook = async (book: TBook) => {
-    await axiosClient.delete(`/books/${book.id}`);
-    await fetchBooks();
   };
 
   return {
     books: data || [],
     isLoading,
-    fetchBooks,
-    deleteBook,
-    addBook,
+    addBookMutation,
+    deleteBookMutation,
+
     editBook,
   };
 }

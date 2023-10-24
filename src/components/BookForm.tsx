@@ -14,7 +14,7 @@ type Props = {
 
 const BookForm = ({ onCancel, book, onClose }: Props) => {
   const { control, handleSubmit: handleSubmitForm, reset } = useForm();
-  const { addBook, editBook } = useBooks();
+  const { editBook, addBookMutation } = useBooks();
 
   const { tags } = useTags();
 
@@ -29,7 +29,7 @@ const BookForm = ({ onCancel, book, onClose }: Props) => {
       await editBook(book.id, convertValues);
     } else {
       // add new book
-      await addBook(convertValues);
+      addBookMutation.mutate(convertValues);
     }
     onClose();
   };

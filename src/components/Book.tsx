@@ -19,7 +19,7 @@ type Props = {
 const Book = ({ book }: Props) => {
   const { setSelectedBook } = useBookStore();
   const { setForm } = useFormModalStore();
-  const { deleteBook } = useBooks();
+  const { deleteBookMutation } = useBooks();
 
   const handleClickEdit = () => {
     setForm("book");
@@ -27,7 +27,7 @@ const Book = ({ book }: Props) => {
   };
 
   const handleClickDelete = async () => {
-    await deleteBook(book);
+    deleteBookMutation.mutate(book);
   };
 
   return (
