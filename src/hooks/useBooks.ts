@@ -1,10 +1,19 @@
+import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../services/axios-client";
 import useBooksStore from "../stores/books";
 import { TBook } from "../types/book";
 
 export function useBooks() {
   // Single Source Of Truth
-  const { books, setBooks } = useBooksStore();
+  const { setBooks } = useBooksStore();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["books"],
+    queryFn: async () => {
+      const response = await axiosClient.get("/books");
+      return response.data;
+    },
+  });
 
   const fetchBooks = async () => {
     const response = await axiosClient.get("/books");
@@ -27,7 +36,8 @@ export function useBooks() {
   };
 
   return {
-    books,
+    books: data || [],
+    isLoading,
     fetchBooks,
     deleteBook,
     addBook,

@@ -1,22 +1,21 @@
 import { Button } from "@material-tailwind/react";
 import cn from "clsx";
-import { useEffect } from "react";
+import { Case, Else, If, Switch, Then } from "react-if";
 import BookForm from "./components/BookForm";
 import BookList from "./components/BookList";
 import TagForm from "./components/TagForm";
 import { useBooks } from "./hooks/useBooks";
 import useBookStore from "./stores/book";
 import useFormModalStore, { FormType } from "./stores/form-modal";
-import { If, Then, Switch, Case } from "react-if";
+
+// Redux
+// Redux Tookit =>
+// RTK Query => Redux Toolkit + Caching + Data Fetching
 
 function App() {
-  const { books, fetchBooks } = useBooks();
+  const { books, isLoading } = useBooks();
   const { selectedBook } = useBookStore();
   const { form, setForm } = useFormModalStore();
-
-  useEffect(() => {
-    fetchBooks();
-  }, []);
 
   const handleSelectForm = (form: FormType) => () => {
     setForm(form);
@@ -40,7 +39,14 @@ function App() {
 
         <div className="grid grid-cols-12 gap-4">
           <div className={cn(form ? "col-span-8" : "col-span-12")}>
-            <BookList books={books} />
+            <If condition={isLoading}>
+              <Then>
+                <div>Loading ....</div>
+              </Then>
+              <Else>
+                <BookList books={books} />
+              </Else>
+            </If>
           </div>
           <div className="col-span-4 space-y-2">
             <Switch>

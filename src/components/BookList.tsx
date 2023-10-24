@@ -13,6 +13,8 @@ const BookList = ({ books, loading }: Props) => {
       {loading ? (
         <Spinner />
       ) : (
+        books &&
+        books.length > 0 &&
         books.map((book) => <Book key={book.id} book={book} />)
       )}
     </div>

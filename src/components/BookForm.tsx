@@ -1,11 +1,9 @@
 import { Button, Card, Typography } from "@material-tailwind/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useBooks } from "../hooks/useBooks";
-import { useLoading } from "../hooks/useLoading";
-import axiosClient from "../services/axios-client";
+import { useTags } from "../hooks/useTags";
 import { TBook } from "../types/book";
-import { TTag } from "../types/tag";
 import { AppChip, AppInput, AppTextarea } from "./ui/app-forms";
 
 type Props = {
@@ -16,11 +14,9 @@ type Props = {
 
 const BookForm = ({ onCancel, book, onClose }: Props) => {
   const { control, handleSubmit: handleSubmitForm, reset } = useForm();
-
   const { addBook, editBook } = useBooks();
 
-  const [loading, { showLoading, hideLoading }] = useLoading();
-  const [tags, setTags] = useState<TTag[]>([]);
+  const { tags } = useTags();
 
   const handleSubmit = async (values: any) => {
     const convertValues = {
@@ -37,17 +33,6 @@ const BookForm = ({ onCancel, book, onClose }: Props) => {
     }
     onClose();
   };
-
-  const getTags = async () => {
-    showLoading();
-    const response = await axiosClient.get("/tags");
-    setTags(response.data);
-    hideLoading();
-  };
-
-  useEffect(() => {
-    getTags();
-  }, []);
 
   useEffect(() => {
     if (!book) return;
